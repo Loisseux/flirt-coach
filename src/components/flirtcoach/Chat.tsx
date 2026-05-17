@@ -186,14 +186,6 @@ export function Chat({
 
       {/* input — FAB was right-aligned and overlapped the send button; keep hints on the left */}
       <div className="relative z-10 border-t border-white/5 px-4 pb-4 pt-3">
-        <button
-          type="button"
-          onClick={openHints}
-          className="fc-gradient absolute -top-6 left-4 z-0 flex h-12 w-12 items-center justify-center rounded-full text-xl shadow-lg active:scale-90"
-          aria-label="Hints"
-        >
-          💡
-        </button>
         <form
           className="relative z-10 flex items-center gap-2"
           onSubmit={(e) => {
@@ -201,6 +193,14 @@ export function Chat({
             void handleSend();
           }}
         >
+          <button
+            type="button"
+            onClick={openHints}
+            className="fc-gradient flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xl shadow-lg active:scale-90"
+            aria-label="Hints"
+          >
+            💡
+          </button>
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}

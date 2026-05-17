@@ -8,12 +8,54 @@ export type Character = {
 };
 
 export const CHARACTERS: Character[] = [
-  { id: "sophie", name: "Sophie", age: 24, personality: "bubbly and extroverted", interests: ["travel", "music festivals", "photography"], color: "#FF2D87" },
-  { id: "alex", name: "Alex", age: 27, personality: "calm and intellectual", interests: ["books", "philosophy", "indie films"], color: "#8B5CF6" },
-  { id: "jordan", name: "Jordan", age: 25, personality: "adventurous and spontaneous", interests: ["hiking", "surfing", "road trips"], color: "#22D3EE" },
-  { id: "mia", name: "Mia", age: 23, personality: "shy and introverted", interests: ["painting", "coffee shops", "cats"], color: "#F472B6" },
-  { id: "lucas", name: "Lucas", age: 28, personality: "confident and direct", interests: ["fitness", "entrepreneurship", "cooking"], color: "#F59E0B" },
-  { id: "emma", name: "Emma", age: 26, personality: "playful and creative", interests: ["design", "dancing", "video games"], color: "#34D399" },
+  {
+    id: "sophie",
+    name: "Sophie",
+    age: 24,
+    personality: "bubbly & extroverted",
+    interests: ["travel", "music festivals", "photography"],
+    color: "#FF2D87",
+  },
+  {
+    id: "alex",
+    name: "Alex",
+    age: 27,
+    personality: "calm & intellectual",
+    interests: ["books", "philosophy", "indie films"],
+    color: "#8B5CF6",
+  },
+  {
+    id: "jordan",
+    name: "Jordan",
+    age: 25,
+    personality: "adventurous & spontaneous",
+    interests: ["hiking", "surfing", "road trips"],
+    color: "#22D3EE",
+  },
+  {
+    id: "mia",
+    name: "Mia",
+    age: 23,
+    personality: "shy & introverted",
+    interests: ["painting", "coffee shops", "cats"],
+    color: "#F472B6",
+  },
+  {
+    id: "lucas",
+    name: "Lucas",
+    age: 28,
+    personality: "confident & direct",
+    interests: ["fitness", "entrepreneurship", "cooking"],
+    color: "#F59E0B",
+  },
+  {
+    id: "emma",
+    name: "Emma",
+    age: 26,
+    personality: "playful & creative",
+    interests: ["design", "dancing", "video games"],
+    color: "#34D399",
+  },
 ];
 
 export type ScenarioId = "cold" | "neutral" | "warming" | "interested" | "very";

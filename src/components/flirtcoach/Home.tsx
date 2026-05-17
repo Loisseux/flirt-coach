@@ -14,14 +14,15 @@ export function Home({ onStart }: { onStart: (c: Character, s: ScenarioId) => vo
       <p className="mb-7 text-sm text-white/60">Pick someone to chat with.</p>
 
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/50">Characters</h2>
-      <div className="-mx-5 mb-8 flex gap-3 overflow-x-auto px-5 pb-2" style={{ scrollbarWidth: "none" }}>
+      <div className="mb-8 grid grid-cols-2 gap-3">
         {CHARACTERS.map((c) => {
           const active = c.id === charId;
           return (
             <button
               key={c.id}
+              type="button"
               onClick={() => setCharId(c.id)}
-              className={`fc-glass flex w-32 shrink-0 flex-col items-center rounded-2xl p-4 text-center transition-all ${active ? "ring-2 ring-pink-500" : "opacity-70"}`}
+              className={`fc-glass flex w-full flex-col items-center rounded-2xl p-4 text-center transition-all ${active ? "ring-2 ring-pink-500" : "opacity-70"}`}
             >
               <div
                 className="mb-3 flex h-16 w-16 items-center justify-center rounded-full text-xl font-bold text-white"

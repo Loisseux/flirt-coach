@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 import { SCENARIOS } from "@/lib/flirtcoach/data";
-import { sendChat, getHints, getFeedback, type ChatMessage } from "@/lib/flirtcoach/claude";
+import {
+  sendChat,
+  getHints,
+  getFeedback,
+  testHintsApiMinimal,
+  type ChatMessage,
+} from "@/lib/flirtcoach/claude";
 
 function fmtTime(d: Date) {
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -9,7 +15,15 @@ function fmtTime(d: Date) {
 
 type Msg = ChatMessage & { t: Date };
 
-export function Chat({ character, scenario, onBack }: { character: Character; scenario: ScenarioId; onBack: () => void }) {
+export function Chat({
+  character,
+  scenario,
+  onBack,
+}: {
+  character: Character;
+  scenario: ScenarioId;
+  onBack: () => void;
+}) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -17,10 +31,17 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
   const [hints, setHints] = useState<{ safe: string; bold: string; funny: string } | null>(null);
   const [hintsLoading, setHintsLoading] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [feedback, setFeedback] = useState<{ score: number; good: string[]; improve: string[]; vibe: string } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    score: number;
+    good: string[];
+    improve: string[];
+    vibe: string;
+  } | null>(null);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -38,12 +59,19 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
     const delay = 1000 + Math.random() * 2000;
     try {
       const [reply] = await Promise.all([
-        sendChat(character, scenario, next.map(({ role, content }) => ({ role, content }))),
+        sendChat(
+          character,
+          scenario,
+          next.map(({ role, content }) => ({ role, content })),
+        ),
         new Promise((r) => setTimeout(r, delay)),
       ]);
       setMessages((m) => [...m, { role: "assistant", content: reply || "...", t: new Date() }]);
     } catch (e) {
-      setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${(e as Error).message}`, t: new Date() }]);
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", content: `⚠️ ${(e as Error).message}`, t: new Date() },
+      ]);
     } finally {
       setTyping(false);
     }
@@ -54,7 +82,9 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
     setHints(null);
     setHintsLoading(true);
     try {
-      const h = await getHints(character, scenario, messages.map(({ role, content }) => ({ role, content })));
+      await testHintsApiMinimal();
+      const history = messagesRef.current.map(({ role, content }) => ({ role, content }));
+      const h = await getHints(character, scenario, history);
       setHints(h);
     } catch (e) {
       setHints({ safe: `⚠️ ${(e as Error).message}`, bold: "", funny: "" });
@@ -69,7 +99,11 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
     setAnimatedScore(0);
     setFeedbackLoading(true);
     try {
-      const f = await getFeedback(character, scenario, messages.map(({ role, content }) => ({ role, content })));
+      const f = await getFeedback(
+        character,
+        scenario,
+        messages.map(({ role, content }) => ({ role, content })),
+      );
       setFeedback(f);
       const start = Date.now();
       const dur = 800;
@@ -97,7 +131,9 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
     <div className="flex h-[100dvh] flex-col" style={{ background: "#0D0F1A" }}>
       {/* header */}
       <header className="fc-glass flex items-center gap-3 border-b border-white/5 px-4 py-3">
-        <button onClick={onBack} className="text-2xl text-white/80 active:scale-90">←</button>
+        <button type="button" onClick={onBack} className="text-2xl text-white/80 active:scale-90">
+          ←
+        </button>
         <div
           className="flex h-10 w-10 items-center justify-center rounded-full text-base font-bold"
           style={{ background: `linear-gradient(135deg, ${character.color}, #8B5CF6)` }}
@@ -109,6 +145,7 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
           <div className="text-[11px] text-white/50">{scenarioLabel}</div>
         </div>
         <button
+          type="button"
           onClick={openFeedback}
           className="fc-glass flex items-center gap-1 rounded-full px-3 py-2 text-sm active:scale-95"
           aria-label="Feedback"
@@ -130,40 +167,52 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
         {typing && (
           <div className="flex items-end gap-2">
             <div className="fc-glass flex gap-1 rounded-2xl px-4 py-3">
-              <span className="fc-dot inline-block h-2 w-2 rounded-full bg-white/60" style={{ animationDelay: "0s" }} />
-              <span className="fc-dot inline-block h-2 w-2 rounded-full bg-white/60" style={{ animationDelay: "0.15s" }} />
-              <span className="fc-dot inline-block h-2 w-2 rounded-full bg-white/60" style={{ animationDelay: "0.3s" }} />
+              <span
+                className="fc-dot inline-block h-2 w-2 rounded-full bg-white/60"
+                style={{ animationDelay: "0s" }}
+              />
+              <span
+                className="fc-dot inline-block h-2 w-2 rounded-full bg-white/60"
+                style={{ animationDelay: "0.15s" }}
+              />
+              <span
+                className="fc-dot inline-block h-2 w-2 rounded-full bg-white/60"
+                style={{ animationDelay: "0.3s" }}
+              />
             </div>
           </div>
         )}
       </div>
 
-      {/* input */}
-      <div className="relative border-t border-white/5 px-4 pb-4 pt-3">
+      {/* input — FAB was right-aligned and overlapped the send button; keep hints on the left */}
+      <div className="relative z-10 border-t border-white/5 px-4 pb-4 pt-3">
         <button
+          type="button"
           onClick={openHints}
-          className="fc-gradient absolute -top-6 right-4 flex h-12 w-12 items-center justify-center rounded-full text-xl shadow-lg active:scale-90"
+          className="fc-gradient absolute -top-6 left-4 z-0 flex h-12 w-12 items-center justify-center rounded-full text-xl shadow-lg active:scale-90"
           aria-label="Hints"
         >
           💡
         </button>
         <form
+          className="relative z-10 flex items-center gap-2"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSend();
+            void handleSend();
           }}
-          className="flex items-center gap-2"
         >
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
             className="fc-glass flex-1 rounded-full px-4 py-3 text-sm text-white outline-none placeholder:text-white/40"
+            aria-label="Message text"
           />
           <button
             type="submit"
             disabled={!input.trim() || typing}
-            className="fc-gradient flex h-11 w-11 items-center justify-center rounded-full text-white shadow-lg active:scale-90 disabled:opacity-40"
+            className="fc-gradient flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white shadow-lg active:scale-90 disabled:opacity-40"
+            aria-label="Send message"
           >
             ➤
           </button>
@@ -185,7 +234,9 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
 
       {feedbackOpen && (
         <Sheet onClose={() => setFeedbackOpen(false)} title="Conversation feedback">
-          {feedbackLoading && <div className="py-6 text-center text-sm text-white/60">Analyzing…</div>}
+          {feedbackLoading && (
+            <div className="py-6 text-center text-sm text-white/60">Analyzing…</div>
+          )}
           {feedback && !feedbackLoading && (
             <div className="space-y-5">
               <div className="text-center">
@@ -194,12 +245,16 @@ export function Chat({ character, scenario, onBack }: { character: Character; sc
                   <span className="text-2xl text-white/40">/10</span>
                 </div>
                 {feedback.vibe && (
-                  <div className="fc-glass mt-3 inline-block rounded-full px-4 py-1.5 text-sm">{feedback.vibe}</div>
+                  <div className="fc-glass mt-3 inline-block rounded-full px-4 py-1.5 text-sm">
+                    {feedback.vibe}
+                  </div>
                 )}
               </div>
               {feedback.good.length > 0 && (
                 <div>
-                  <div className="mb-2 text-sm font-semibold text-emerald-400">✅ What went well</div>
+                  <div className="mb-2 text-sm font-semibold text-emerald-400">
+                    ✅ What went well
+                  </div>
                   <ul className="space-y-1.5 text-sm text-white/80">
                     {feedback.good.map((g, i) => (
                       <li key={i}>• {g}</li>
@@ -237,15 +292,28 @@ function Bubble({ msg }: { msg: Msg }) {
         >
           {msg.content}
         </div>
-        <div className={`mt-1 text-[10px] text-white/40 ${isUser ? "text-right" : "text-left"}`}>{fmtTime(msg.t)}</div>
+        <div className={`mt-1 text-[10px] text-white/40 ${isUser ? "text-right" : "text-left"}`}>
+          {fmtTime(msg.t)}
+        </div>
       </div>
     </div>
   );
 }
 
-function HintRow({ label, color, text, onPick }: { label: string; color: string; text: string; onPick: (t: string) => void }) {
+function HintRow({
+  label,
+  color,
+  text,
+  onPick,
+}: {
+  label: string;
+  color: string;
+  text: string;
+  onPick: (t: string) => void;
+}) {
   return (
     <button
+      type="button"
       onClick={() => text && onPick(text)}
       className="fc-glass flex w-full flex-col items-start gap-1 rounded-2xl p-4 text-left active:scale-[0.99]"
     >
@@ -257,7 +325,15 @@ function HintRow({ label, color, text, onPick }: { label: string; color: string;
   );
 }
 
-function Sheet({ children, onClose, title }: { children: React.ReactNode; onClose: () => void; title: string }) {
+function Sheet({
+  children,
+  onClose,
+  title,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+  title: string;
+}) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
       <div
@@ -267,7 +343,7 @@ function Sheet({ children, onClose, title }: { children: React.ReactNode; onClos
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/20" />
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-base font-semibold">{title}</h3>
-          <button onClick={onClose} className="text-white/60 active:scale-90">
+          <button type="button" onClick={onClose} className="text-white/60 active:scale-90">
             ✕
           </button>
         </div>

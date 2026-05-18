@@ -5,7 +5,6 @@ import {
   sendChat,
   getHints,
   getFeedback,
-  testHintsApiMinimal,
   type ChatMessage,
 } from "@/lib/flirtcoach/claude";
 
@@ -82,7 +81,6 @@ export function Chat({
     setHints(null);
     setHintsLoading(true);
     try {
-      await testHintsApiMinimal();
       const history = messagesRef.current.map(({ role, content }) => ({ role, content }));
       const h = await getHints(character, scenario, history);
       setHints(h);

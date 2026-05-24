@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 import { SCENARIOS } from "@/lib/flirtcoach/data";
-import {
-  sendChat,
-  getHints,
-  getFeedback,
-  type ChatMessage,
-} from "@/lib/flirtcoach/claude";
+import { sendChat, getHints, getFeedback, type ChatMessage } from "@/lib/flirtcoach/claude";
+import { saveMessage } from "@/lib/supabase/conversations";
 
 function fmtTime(d: Date) {
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -17,10 +13,12 @@ type Msg = ChatMessage & { t: Date };
 export function Chat({
   character,
   scenario,
+  conversationId,
   onBack,
 }: {
   character: Character;
   scenario: ScenarioId;
+  conversationId: string;
   onBack: () => void;
 }) {
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -46,6 +44,14 @@ export function Chat({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
+  async function persistMessage(role: "user" | "assistant", content: string) {
+    try {
+      await saveMessage(conversationId, role, content);
+    } catch (e) {
+      console.error("Failed to save message:", e);
+    }
+  }
+
   async function handleSend(textOverride?: string) {
     const text = (textOverride ?? input).trim();
     if (!text || typing) return;
@@ -54,6 +60,7 @@ export function Chat({
     setMessages(next);
     setInput("");
     setTyping(true);
+    void persistMessage("user", text);
 
     const delay = 1000 + Math.random() * 2000;
     try {
@@ -65,12 +72,13 @@ export function Chat({
         ),
         new Promise((r) => setTimeout(r, delay)),
       ]);
-      setMessages((m) => [...m, { role: "assistant", content: reply || "...", t: new Date() }]);
+      const replyText = reply || "...";
+      setMessages((m) => [...m, { role: "assistant", content: replyText, t: new Date() }]);
+      void persistMessage("assistant", replyText);
     } catch (e) {
-      setMessages((m) => [
-        ...m,
-        { role: "assistant", content: `⚠️ ${(e as Error).message}`, t: new Date() },
-      ]);
+      const errText = `⚠️ ${(e as Error).message}`;
+      setMessages((m) => [...m, { role: "assistant", content: errText, t: new Date() }]);
+      void persistMessage("assistant", errText);
     } finally {
       setTyping(false);
     }

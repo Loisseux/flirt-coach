@@ -1,19 +1,37 @@
 import { useState } from "react";
 import { CHARACTERS, SCENARIOS, type Character, type ScenarioId } from "@/lib/flirtcoach/data";
 
-export function Home({ onStart }: { onStart: (c: Character, s: ScenarioId) => void }) {
+export function Home({
+  onStart,
+  onProfile,
+}: {
+  onStart: (c: Character, s: ScenarioId) => void;
+  onProfile: () => void;
+}) {
   const [charId, setCharId] = useState(CHARACTERS[0].id);
   const [scen, setScen] = useState<ScenarioId>("neutral");
   const character = CHARACTERS.find((c) => c.id === charId)!;
 
   return (
     <div className="flex min-h-[100dvh] flex-col px-5 pb-6 pt-10" style={{ background: "#0D0F1A" }}>
-      <h1 className="mb-1 text-2xl font-bold">
-        <span className="fc-gradient-text">FlirtCoach</span>
-      </h1>
+      <div className="mb-1 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">
+          <span className="fc-gradient-text">FlirtCoach</span>
+        </h1>
+        <button
+          type="button"
+          onClick={onProfile}
+          className="fc-glass flex h-10 w-10 items-center justify-center rounded-full text-lg active:scale-90"
+          aria-label="Profile"
+        >
+          👤
+        </button>
+      </div>
       <p className="mb-7 text-sm text-white/60">Pick someone to chat with.</p>
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/50">Characters</h2>
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/50">
+        Characters
+      </h2>
       <div className="mb-8 grid grid-cols-2 gap-3">
         {CHARACTERS.map((c) => {
           const active = c.id === charId;
@@ -39,7 +57,9 @@ export function Home({ onStart }: { onStart: (c: Character, s: ScenarioId) => vo
         })}
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/50">Scenario</h2>
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/50">
+        Scenario
+      </h2>
       <div className="mb-2 grid grid-cols-5 gap-2">
         {SCENARIOS.map((s) => {
           const active = s.id === scen;
@@ -54,7 +74,9 @@ export function Home({ onStart }: { onStart: (c: Character, s: ScenarioId) => vo
           );
         })}
       </div>
-      <p className="mb-8 text-center text-xs text-white/60">{SCENARIOS.find((s) => s.id === scen)!.label}</p>
+      <p className="mb-8 text-center text-xs text-white/60">
+        {SCENARIOS.find((s) => s.id === scen)!.label}
+      </p>
 
       <div className="flex-1" />
 

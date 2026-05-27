@@ -5,6 +5,8 @@ create table public.conversations (
   user_id uuid not null references auth.users(id) on delete cascade,
   character_id text not null,
   scenario_id text not null,
+  score numeric,
+  feedback_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

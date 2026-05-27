@@ -5,6 +5,9 @@ import { Home } from "@/components/flirtcoach/Home";
 import { Chat } from "@/components/flirtcoach/Chat";
 import { Auth } from "@/components/flirtcoach/Auth";
 import { Profile } from "@/components/flirtcoach/Profile";
+import { History } from "@/components/flirtcoach/History";
+import { HistoryChat } from "@/components/flirtcoach/HistoryChat";
+import { Stats } from "@/components/flirtcoach/Stats";
 import { useAuth } from "@/contexts/AuthContext";
 import { createConversation } from "@/lib/supabase/conversations";
 import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
@@ -14,7 +17,7 @@ export const Route = createFileRoute("/")({
   ssr: false,
 });
 
-type Screen = "onboarding" | "home" | "chat" | "profile";
+type Screen = "onboarding" | "home" | "chat" | "profile" | "history" | "historyChat" | "stats";
 
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -22,6 +25,7 @@ function App() {
   const [character, setCharacter] = useState<Character | null>(null);
   const [scenario, setScenario] = useState<ScenarioId>("neutral");
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [historyConversationId, setHistoryConversationId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
 
@@ -69,22 +73,42 @@ function App() {
 
   return (
     <div className="mx-auto min-h-[100dvh] w-full max-w-[430px]" style={{ background: "#0D0F1A" }}>
-      {screen === "onboarding" && <Onboarding onDone={finishOnboarding} />}
-      {screen === "home" && (
-        <Home onStart={(c, s) => void startChat(c, s)} onProfile={() => setScreen("profile")} />
-      )}
-      {screen === "profile" && <Profile onBack={() => setScreen("home")} />}
-      {screen === "chat" && character && conversationId && (
-        <Chat
-          character={character}
-          scenario={scenario}
-          conversationId={conversationId}
-          onBack={() => {
-            setConversationId(null);
-            setScreen("home");
-          }}
-        />
-      )}
+      <div key={screen} className="fc-fade transition-opacity duration-200">
+        {screen === "onboarding" && <Onboarding onDone={finishOnboarding} />}
+        {screen === "home" && (
+          <Home
+            onStart={(c, s) => void startChat(c, s)}
+            onProfile={() => setScreen("profile")}
+            onHistory={() => setScreen("history")}
+            onStats={() => setScreen("stats")}
+          />
+        )}
+        {screen === "profile" && <Profile onBack={() => setScreen("home")} />}
+        {screen === "history" && (
+          <History
+            onBack={() => setScreen("home")}
+            onOpenConversation={(id) => {
+              setHistoryConversationId(id);
+              setScreen("historyChat");
+            }}
+          />
+        )}
+        {screen === "stats" && <Stats onBack={() => setScreen("home")} />}
+        {screen === "historyChat" && historyConversationId && (
+          <HistoryChat conversationId={historyConversationId} onBack={() => setScreen("history")} />
+        )}
+        {screen === "chat" && character && conversationId && (
+          <Chat
+            character={character}
+            scenario={scenario}
+            conversationId={conversationId}
+            onBack={() => {
+              setConversationId(null);
+              setScreen("home");
+            }}
+          />
+        )}
+      </div>
       {startingChat && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="fc-glass rounded-2xl px-6 py-4 text-sm text-white/80">Starting chat…</div>

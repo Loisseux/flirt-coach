@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 import { SCENARIOS } from "@/lib/flirtcoach/data";
 import { sendChat, getHints, getFeedback, type ChatMessage } from "@/lib/flirtcoach/claude";
-import { saveMessage } from "@/lib/supabase/conversations";
+import { saveConversationScore, saveMessage } from "@/lib/supabase/conversations";
 
 function fmtTime(d: Date) {
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -111,6 +111,10 @@ export function Chat({
         messages.map(({ role, content }) => ({ role, content })),
       );
       setFeedback(f);
+      // Persist score so the history + stats screens can be computed later.
+      void saveConversationScore(conversationId, f.score).catch((e) => {
+        console.error("Failed to save conversation score:", e);
+      });
       const start = Date.now();
       const dur = 800;
       const tick = () => {

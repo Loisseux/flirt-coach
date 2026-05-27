@@ -4,9 +4,13 @@ import { CHARACTERS, SCENARIOS, type Character, type ScenarioId } from "@/lib/fl
 export function Home({
   onStart,
   onProfile,
+  onHistory,
+  onStats,
 }: {
   onStart: (c: Character, s: ScenarioId) => void;
   onProfile: () => void;
+  onHistory: () => void;
+  onStats: () => void;
 }) {
   const [charId, setCharId] = useState(CHARACTERS[0].id);
   const [scen, setScen] = useState<ScenarioId>("neutral");
@@ -28,6 +32,23 @@ export function Home({
         </button>
       </div>
       <p className="mb-7 text-sm text-white/60">Pick someone to chat with.</p>
+
+      <div className="mb-8 grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={onHistory}
+          className="fc-glass rounded-2xl py-3 text-sm font-semibold text-white active:scale-[0.99]"
+        >
+          🕘 History
+        </button>
+        <button
+          type="button"
+          onClick={onStats}
+          className="fc-glass rounded-2xl py-3 text-sm font-semibold text-white active:scale-[0.99]"
+        >
+          📈 Stats
+        </button>
+      </div>
 
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-white/50">
         Characters

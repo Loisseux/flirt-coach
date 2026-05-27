@@ -14,7 +14,6 @@ import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 
 export const Route = createFileRoute("/")({
   component: App,
-  ssr: false,
 });
 
 type Screen = "onboarding" | "home" | "chat" | "profile" | "history" | "historyChat" | "stats";

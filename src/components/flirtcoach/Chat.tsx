@@ -215,7 +215,7 @@ export function Chat({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
-            className="fc-glass flex-1 rounded-full px-4 py-3 text-sm text-white outline-none placeholder:text-white/40"
+            className="fc-glass flex-1 rounded-full px-4 py-3 text-base text-white outline-none placeholder:text-white/40"
             aria-label="Message text"
           />
           <button

@@ -56,23 +56,22 @@ function App() {
   }
 
   if (!hydrated || authLoading) {
-    return <div className="min-h-[100dvh]" style={{ background: "#0D0F1A" }} />;
+    return <div className="fc-app-shell min-h-[100dvh]" />;
   }
 
   if (!user) {
     return (
-      <div
-        className="mx-auto min-h-[100dvh] w-full max-w-[430px]"
-        style={{ background: "#0D0F1A" }}
-      >
-        <Auth />
+      <div className="fc-app-shell mx-auto w-full max-w-[430px]">
+        <div className="fc-screen-host">
+          <Auth />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto min-h-[100dvh] w-full max-w-[430px]" style={{ background: "#0D0F1A" }}>
-      <div key={screen} className="fc-fade transition-opacity duration-200">
+    <div className="fc-app-shell mx-auto w-full max-w-[430px]">
+      <div key={screen} className="fc-screen-host fc-fade transition-opacity duration-200">
         {screen === "onboarding" && <Onboarding onDone={finishOnboarding} />}
         {screen === "home" && (
           <Home

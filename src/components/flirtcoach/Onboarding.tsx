@@ -12,7 +12,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const last = i === SLIDES.length - 1;
 
   return (
-    <div className="flex min-h-[100dvh] flex-col px-6 py-8" style={{ background: "#0D0F1A" }}>
+    <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-col px-6 py-8">
       <div className="flex justify-end">
         <button onClick={onDone} className="text-sm text-white/60 hover:text-white">
           Skip

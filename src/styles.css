@@ -3,11 +3,75 @@
 @import "tw-animate-css";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
-html, body {
+html, body, #root {
   font-family: "Inter", system-ui, sans-serif;
   background-color: #0D0F1A;
   color: white;
   -webkit-font-smoothing: antialiased;
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* Main app shell — safe area on all edges (Capacitor / iOS notch & home indicator). */
+.fc-app-shell {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  background-color: #0D0F1A;
+}
+
+/* Flex child that hosts a single screen — required for iOS overflow scrolling. */
+.fc-screen-host {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Scrollable full-page content (home, history, stats, auth, etc.). */
+.fc-screen-scroll {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Extra bottom space inside scroll areas so CTAs clear the home indicator. */
+.fc-scroll-bottom-pad {
+  padding-bottom: calc(1.5rem + var(--safe-bottom));
+}
+
+/* Fixed-height screen (chat) that fills the host without scrolling the page. */
+.fc-screen-fill {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .fc-gradient {
@@ -38,7 +102,7 @@ html, body {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
-.fc-sheet { animation: fc-slide-up 0.25s ease-out; }
+.fc-sheet { animation: fc-slide-up 0.25s ease-out; padding-bottom: calc(2rem + var(--safe-bottom)); }
 
 @keyframes fc-fade-in {
   from { opacity: 0; transform: translateY(6px); }

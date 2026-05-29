@@ -39,7 +39,7 @@ export function Auth() {
   }
 
   return (
-    <div className="flex min-h-[100dvh] flex-col px-6 py-10" style={{ background: "#0D0F1A" }}>
+    <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-col px-6 py-8">
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold">
           <span className="fc-gradient-text">FlirtCoach</span>

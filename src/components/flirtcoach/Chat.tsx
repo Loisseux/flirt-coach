@@ -138,7 +138,7 @@ export function Chat({
   const scenarioLabel = SCENARIOS.find((s) => s.id === scenario)!.label;
 
   return (
-    <div className="flex h-[100dvh] flex-col" style={{ background: "#0D0F1A" }}>
+    <div className="fc-screen-fill">
       {/* header */}
       <header className="fc-glass flex items-center gap-3 border-b border-white/5 px-4 py-3">
         <button type="button" onClick={onBack} className="text-2xl text-white/80 active:scale-90">
@@ -347,7 +347,7 @@ function Sheet({
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
       <div
-        className="fc-sheet w-full max-w-[430px] rounded-t-3xl border-t border-white/10 bg-[#13162a] p-5 pb-8"
+        className="fc-sheet w-full max-w-[430px] rounded-t-3xl border-t border-white/10 bg-[#13162a] p-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/20" />

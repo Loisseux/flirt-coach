@@ -99,7 +99,7 @@ export function Stats({ onBack }: { onBack: () => void }) {
   }, [conversations, scenariosById]);
 
   return (
-    <div className="flex min-h-[100dvh] flex-col px-5 pb-6 pt-8" style={{ background: "#0D0F1A" }}>
+    <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-col px-5 pt-4">
       <header className="mb-5 flex items-center gap-3">
         <button type="button" onClick={onBack} className="text-2xl text-white/80 active:scale-90">
           ←
@@ -114,7 +114,7 @@ export function Stats({ onBack }: { onBack: () => void }) {
           No practice yet. Start a conversation and open feedback to track your scores.
         </div>
       ) : (
-        <div className="flex-1 space-y-3 overflow-y-auto pb-2">
+        <div className="space-y-3 pb-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="fc-glass rounded-2xl p-4">
               <div className="text-xs font-semibold uppercase tracking-wider text-white/50">

@@ -17,7 +17,7 @@ export function Home({
   const character = CHARACTERS.find((c) => c.id === charId)!;
 
   return (
-    <div className="flex min-h-[100dvh] flex-col px-5 pb-6 pt-10" style={{ background: "#0D0F1A" }}>
+    <div className="fc-screen-scroll fc-scroll-bottom-pad flex flex-col px-5 pt-4">
       <div className="mb-1 flex items-center justify-between">
         <h1 className="text-2xl font-bold">
           <span className="fc-gradient-text">FlirtCoach</span>
@@ -99,9 +99,8 @@ export function Home({
         {SCENARIOS.find((s) => s.id === scen)!.label}
       </p>
 
-      <div className="flex-1" />
-
       <button
+        type="button"
         onClick={() => onStart(character, scen)}
         className="fc-gradient w-full rounded-2xl py-4 text-base font-semibold text-white shadow-lg active:scale-[0.98]"
       >

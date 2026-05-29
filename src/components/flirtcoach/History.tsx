@@ -38,7 +38,7 @@ export function History({
   const charsById = useMemo(() => new Map(CHARACTERS.map((c) => [c.id, c])), []);
 
   return (
-    <div className="flex min-h-[100dvh] flex-col px-5 pb-6 pt-8" style={{ background: "#0D0F1A" }}>
+    <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-col px-5 pt-4">
       <header className="mb-5 flex items-center gap-3">
         <button type="button" onClick={onBack} className="text-2xl text-white/80 active:scale-90">
           ←
@@ -53,7 +53,7 @@ export function History({
           No conversations yet. Start one from the home screen.
         </div>
       ) : (
-        <div className="flex-1 space-y-3 overflow-y-auto pb-2">
+        <div className="space-y-3 pb-2">
           {conversations.map((c) => {
             const char = charsById.get(c.character_id) as Character | undefined;
             const scen = scenariosById.get(c.scenario_id as ScenarioId);

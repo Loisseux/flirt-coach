@@ -9,7 +9,7 @@ export function Profile({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="flex min-h-[100dvh] flex-col px-5 pb-6 pt-6" style={{ background: "#0D0F1A" }}>
+    <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-col px-5 pt-4">
       <header className="mb-8 flex items-center gap-3">
         <button type="button" onClick={onBack} className="text-2xl text-white/80 active:scale-90">
           ←

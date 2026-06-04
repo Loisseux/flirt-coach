@@ -20,7 +20,7 @@ export function Home({
     <div className="fc-screen-scroll fc-scroll-bottom-pad flex flex-col px-5 pt-4">
       <div className="mb-1 flex items-center justify-between">
         <h1 className="text-2xl font-bold">
-          <span className="fc-gradient-text">FlirtCoach</span>
+          <span className="fc-gradient-text">Quippr</span>
         </h1>
         <button
           type="button"

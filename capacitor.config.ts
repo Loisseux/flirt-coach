@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.flirtcoach.app',
-  appName: 'FlirtCoach',
+  appId: 'com.quippr.app',
+  appName: 'Quippr',
   webDir: 'dist'
 };
 

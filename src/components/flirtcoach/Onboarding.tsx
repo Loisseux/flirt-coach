@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const SLIDES = [
-  { emoji: "💬", title: "Practice makes perfect", subtitle: "Train your flirting skills in a safe, judgment-free space" },
+  { emoji: "💬", title: "Practice makes perfect", subtitle: "Train your conversation skills with Quippr in a safe, judgment-free space" },
   { emoji: "🎯", title: "Choose your scenario", subtitle: "From cold start to very interested — you decide the challenge" },
   { emoji: "📊", title: "Get real feedback", subtitle: "AI scores your conversation and tells you exactly how to improve" },
 ];
@@ -13,6 +13,12 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-col px-6 py-8">
+      <div className="mb-6 text-center">
+        <h1 className="text-2xl font-bold">
+          <span className="fc-gradient-text">Quippr</span>
+        </h1>
+      </div>
+
       <div className="flex justify-end">
         <button onClick={onDone} className="text-sm text-white/60 hover:text-white">
           Skip

@@ -42,7 +42,7 @@ export function Auth() {
     <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-col px-6 py-8">
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold">
-          <span className="fc-gradient-text">FlirtCoach</span>
+          <span className="fc-gradient-text">Quippr</span>
         </h1>
         <p className="mt-2 text-sm text-white/60">
           {mode === "signin"

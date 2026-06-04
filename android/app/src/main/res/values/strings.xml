@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">FlirtCoach</string>
-    <string name="title_activity_main">FlirtCoach</string>
-    <string name="package_name">com.flirtcoach.app</string>
-    <string name="custom_url_scheme">com.flirtcoach.app</string>
+    <string name="app_name">Quippr</string>
+    <string name="title_activity_main">Quippr</string>
+    <string name="package_name">com.quippr.app</string>
+    <string name="custom_url_scheme">com.quippr.app</string>
 </resources>

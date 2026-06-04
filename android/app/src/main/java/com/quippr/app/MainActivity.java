@@ -1,4 +1,4 @@
-package com.flirtcoach.app;
+package com.quippr.app;
 
 import com.getcapacitor.BridgeActivity;
 

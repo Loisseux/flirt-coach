@@ -8,7 +8,9 @@ import { Profile } from "@/components/flirtcoach/Profile";
 import { History } from "@/components/flirtcoach/History";
 import { HistoryChat } from "@/components/flirtcoach/HistoryChat";
 import { Stats } from "@/components/flirtcoach/Stats";
+import { GdprConsent } from "@/components/flirtcoach/GdprConsent";
 import { useAuth } from "@/contexts/AuthContext";
+import { hasGdprConsent } from "@/lib/gdpr";
 import { createConversation } from "@/lib/supabase/conversations";
 import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 
@@ -26,9 +28,11 @@ function App() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [historyConversationId, setHistoryConversationId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [consentGiven, setConsentGiven] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
 
   useEffect(() => {
+    setConsentGiven(hasGdprConsent());
     const done = localStorage.getItem("fc_onboarded") === "1";
     setScreen(done ? "home" : "onboarding");
     setHydrated(true);
@@ -57,6 +61,16 @@ function App() {
 
   if (!hydrated || authLoading) {
     return <div className="fc-app-shell min-h-[100dvh]" />;
+  }
+
+  if (!consentGiven) {
+    return (
+      <div className="fc-app-shell mx-auto w-full max-w-[430px]">
+        <div className="fc-screen-host">
+          <GdprConsent onAccept={() => setConsentGiven(true)} />
+        </div>
+      </div>
+    );
   }
 
   if (!user) {

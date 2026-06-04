@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
+import { deleteAccount as deleteAccountData } from "@/lib/supabase/account";
 
 type AuthContextValue = {
   user: User | null;
@@ -18,6 +19,7 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<{ error: string | null }>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -64,6 +66,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   }, []);
 
+  const deleteAccount = useCallback(async () => {
+    const userId = session?.user?.id;
+    if (!userId) return { error: "Not signed in." };
+
+    try {
+      await deleteAccountData(userId);
+      await supabase.auth.signOut();
+      return { error: null };
+    } catch (e) {
+      return { error: (e as Error).message };
+    }
+  }, [session?.user?.id]);
+
   const value = useMemo(
     () => ({
       user: session?.user ?? null,
@@ -73,8 +88,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signInWithGoogle,
       signOut,
+      deleteAccount,
     }),
-    [session, loading, signUp, signIn, signInWithGoogle, signOut],
+    [session, loading, signUp, signIn, signInWithGoogle, signOut, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

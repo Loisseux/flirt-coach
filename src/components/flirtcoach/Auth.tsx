@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 type Mode = "signin" | "signup";
 
 export function Auth() {
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp, signInWithApple, signInWithGoogle } = useAuth();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +27,14 @@ export function Auth() {
       setInfo("Check your email to confirm your account, then sign in.");
     }
 
+    setBusy(false);
+  }
+
+  async function handleApple() {
+    setError(null);
+    setBusy(true);
+    const result = await signInWithApple();
+    if (result.error) setError(result.error);
     setBusy(false);
   }
 
@@ -90,15 +98,27 @@ export function Auth() {
         <div className="h-px flex-1 bg-white/10" />
       </div>
 
-      <button
-        type="button"
-        onClick={() => void handleGoogle()}
-        disabled={busy}
-        className="fc-glass flex w-full items-center justify-center gap-3 rounded-2xl py-4 text-sm font-semibold text-white active:scale-[0.98] disabled:opacity-50"
-      >
-        <GoogleIcon />
-        Continue with Google
-      </button>
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={() => void handleApple()}
+          disabled={busy}
+          className="flex w-full items-center justify-center gap-3 rounded-2xl bg-black py-4 text-sm font-semibold text-white active:scale-[0.98] disabled:opacity-50"
+        >
+          <AppleIcon />
+          Continue with Apple
+        </button>
+
+        <button
+          type="button"
+          onClick={() => void handleGoogle()}
+          disabled={busy}
+          className="fc-glass flex w-full items-center justify-center gap-3 rounded-2xl py-4 text-sm font-semibold text-white active:scale-[0.98] disabled:opacity-50"
+        >
+          <GoogleIcon />
+          Continue with Google
+        </button>
+      </div>
 
       <p className="mt-8 text-center text-sm text-white/60">
         {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
@@ -115,6 +135,14 @@ export function Auth() {
         </button>
       </p>
     </div>
+  );
+}
+
+function AppleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" fill="currentColor">
+      <path d="M14.94 9.54c-.03-2.17 1.77-3.21 1.85-3.26-1.01-1.47-2.58-1.67-3.14-1.69-1.34-.14-2.61.79-3.29.79-.68 0-1.73-.77-2.85-.75-1.47.02-2.82.85-3.57 2.16-1.52 2.64-.39 6.54 1.09 8.69.72 1.04 1.58 2.21 2.71 2.17 1.09-.04 1.5-.7 2.82-.7 1.32 0 1.69.7 2.85.68 1.18-.02 1.93-1.06 2.64-2.1.83-1.21 1.17-2.38 1.19-2.44-.03-.01-2.28-.87-2.3-3.45zM12.56 3.02c.6-.73 1.01-1.74.9-2.75-.87.04-1.93.58-2.56 1.31-.56.64-1.05 1.67-.92 2.65.97.08 1.96-.49 2.58-1.21z" />
+    </svg>
   );
 }
 

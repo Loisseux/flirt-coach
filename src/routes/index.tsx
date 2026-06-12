@@ -66,7 +66,7 @@ function App() {
   if (!consentGiven) {
     return (
       <div className="fc-app-shell mx-auto w-full max-w-[430px]">
-        <div className="fc-screen-host">
+        <div className="fc-screen-host fc-screen-panel">
           <GdprConsent onAccept={() => setConsentGiven(true)} />
         </div>
       </div>
@@ -76,7 +76,7 @@ function App() {
   if (!user) {
     return (
       <div className="fc-app-shell mx-auto w-full max-w-[430px]">
-        <div className="fc-screen-host">
+        <div className="fc-screen-host fc-screen-panel">
           <Auth />
         </div>
       </div>
@@ -85,7 +85,7 @@ function App() {
 
   return (
     <div className="fc-app-shell mx-auto w-full max-w-[430px]">
-      <div key={screen} className="fc-screen-host fc-fade transition-opacity duration-200">
+      <div key={screen} className="fc-screen-host fc-screen-panel fc-fade transition-opacity duration-200">
         {screen === "onboarding" && <Onboarding onDone={finishOnboarding} />}
         {screen === "home" && (
           <Home

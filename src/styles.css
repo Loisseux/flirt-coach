@@ -9,6 +9,8 @@ html, body, #root {
   color: white;
   -webkit-font-smoothing: antialiased;
   height: 100%;
+  min-height: 100%;
+  min-height: -webkit-fill-available;
   margin: 0;
 }
 
@@ -30,7 +32,9 @@ html, body, #root {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  height: 100vh;
   height: 100dvh;
+  height: -webkit-fill-available;
   max-height: 100dvh;
   overflow: hidden;
   padding-top: var(--safe-top);
@@ -46,6 +50,16 @@ html, body, #root {
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
+}
+
+/* Direct child of host must fill available height so inner scroll areas work on iOS. */
+.fc-screen-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Scrollable full-page content (home, history, stats, auth, etc.). */
@@ -53,15 +67,18 @@ html, body, #root {
   box-sizing: border-box;
   flex: 1 1 auto;
   min-height: 0;
+  width: 100%;
+  height: 100%;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  touch-action: pan-y;
 }
 
 /* Extra bottom space inside scroll areas so CTAs clear the home indicator. */
 .fc-scroll-bottom-pad {
-  padding-bottom: calc(1.5rem + var(--safe-bottom));
+  padding-bottom: calc(var(--safe-bottom) + 20px);
 }
 
 /* Fixed-height screen (chat) that fills the host without scrolling the page. */

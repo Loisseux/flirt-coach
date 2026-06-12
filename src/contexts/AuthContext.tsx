@@ -10,6 +10,7 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
 import { deleteAccount as deleteAccountData } from "@/lib/supabase/account";
+import { getOAuthRedirectUrl } from "@/lib/supabase/auth";
 
 type AuthContextValue = {
   user: User | null;
@@ -18,6 +19,7 @@ type AuthContextValue = {
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
+  signInWithApple: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<{ error: string | null }>;
 };
@@ -57,7 +59,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = useCallback(async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: getOAuthRedirectUrl() },
+    });
+    return { error: error?.message ?? null };
+  }, []);
+
+  const signInWithApple = useCallback(async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "apple",
+      options: {
+        redirectTo: getOAuthRedirectUrl(),
+        scopes: "email name",
+      },
     });
     return { error: error?.message ?? null };
   }, []);
@@ -87,10 +100,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       signIn,
       signInWithGoogle,
+      signInWithApple,
       signOut,
       deleteAccount,
     }),
-    [session, loading, signUp, signIn, signInWithGoogle, signOut, deleteAccount],
+    [session, loading, signUp, signIn, signInWithGoogle, signInWithApple, signOut, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

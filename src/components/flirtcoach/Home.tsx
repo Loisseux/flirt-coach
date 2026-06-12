@@ -17,7 +17,7 @@ export function Home({
   const character = CHARACTERS.find((c) => c.id === charId)!;
 
   return (
-    <div className="fc-screen-scroll fc-scroll-bottom-pad flex flex-col px-5 pt-4">
+    <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-1 flex-col px-5 pt-4">
       <div className="mb-1 flex items-center justify-between">
         <h1 className="text-2xl font-bold">
           <span className="fc-gradient-text">Quippr</span>
@@ -102,7 +102,7 @@ export function Home({
       <button
         type="button"
         onClick={() => onStart(character, scen)}
-        className="fc-gradient w-full rounded-2xl py-4 text-base font-semibold text-white shadow-lg active:scale-[0.98]"
+        className="fc-gradient mt-2 w-full shrink-0 rounded-2xl py-4 text-base font-semibold text-white shadow-lg active:scale-[0.98]"
       >
         Start conversation →
       </button>

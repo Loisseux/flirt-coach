@@ -14,6 +14,10 @@
     "cap:sync:android": "npm run build && npx cap sync android",
     "cap:open:ios": "npx cap open ios",
     "cap:open:android": "npx cap open android",
+    "icons:ios": "bash scripts/generate-ios-app-icon.sh",
+    "icons:android": "bash scripts/generate-android-app-icon.sh",
+    "icons": "npm run icons:ios && npm run icons:android",
+    "apple:client-secret": "node scripts/generate-apple-client-secret.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

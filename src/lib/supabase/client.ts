@@ -7,4 +7,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn("Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY — add them to your .env file.");
 }
 
-export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "");
+export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "", {
+  auth: {
+    detectSessionInUrl: true,
+    flowType: "pkce",
+  },
+});

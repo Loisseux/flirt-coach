@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 type Mode = "signin" | "signup";
 
 export function Auth() {
-  const { signIn, signUp, signInWithApple, signInWithGoogle } = useAuth();
+  const { signIn, signUp, signInWithApple, signInWithGoogle, oauthError, clearOauthError } = useAuth();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,6 +32,7 @@ export function Auth() {
 
   async function handleApple() {
     setError(null);
+    clearOauthError();
     setBusy(true);
     const result = await signInWithApple();
     if (result.error) setError(result.error);
@@ -40,6 +41,7 @@ export function Auth() {
 
   async function handleGoogle() {
     setError(null);
+    clearOauthError();
     setBusy(true);
     const result = await signInWithGoogle();
     if (result.error) setError(result.error);
@@ -81,6 +83,7 @@ export function Auth() {
         />
 
         {error && <p className="text-center text-sm text-pink-400">{error}</p>}
+        {oauthError && <p className="text-center text-sm text-pink-400">{oauthError}</p>}
         {info && <p className="text-center text-sm text-emerald-400">{info}</p>}
 
         <button

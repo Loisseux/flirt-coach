@@ -18,6 +18,9 @@
     "icons:android": "bash scripts/generate-android-app-icon.sh",
     "icons": "npm run icons:ios && npm run icons:android",
     "apple:client-secret": "node scripts/generate-apple-client-secret.mjs",
+    "ipad:screenshots": "node scripts/generate-store-screenshots.mjs --preset ipad",
+    "android:tablet-screenshots": "node scripts/generate-store-screenshots.mjs --preset android-tablet",
+    "android:tablet-10-screenshots": "node scripts/generate-store-screenshots.mjs --preset android-tablet-10",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -94,6 +97,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "prettier": "^3.7.3",
+    "sharp": "^0.35.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1"

@@ -10,7 +10,7 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
 import { deleteAccount as deleteAccountData } from "@/lib/supabase/account";
-import { getOAuthRedirectUrl } from "@/lib/supabase/auth";
+import { registerNativeOAuthListener, signInWithOAuthProvider } from "@/lib/supabase/auth";
 
 type AuthContextValue = {
   user: User | null;
@@ -20,6 +20,8 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
   signInWithApple: () => Promise<{ error: string | null }>;
+  oauthError: string | null;
+  clearOauthError: () => void;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<{ error: string | null }>;
 };
@@ -29,6 +31,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [oauthError, setOauthError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -46,6 +49,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    return registerNativeOAuthListener((message) => setOauthError(message));
+  }, []);
+
   const signUp = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({ email, password });
     return { error: error?.message ?? null };
@@ -57,23 +64,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: getOAuthRedirectUrl() },
-    });
-    return { error: error?.message ?? null };
+    setOauthError(null);
+    return signInWithOAuthProvider("google");
   }, []);
 
   const signInWithApple = useCallback(async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "apple",
-      options: {
-        redirectTo: getOAuthRedirectUrl(),
-        scopes: "email name",
-      },
-    });
-    return { error: error?.message ?? null };
+    setOauthError(null);
+    return signInWithOAuthProvider("apple");
   }, []);
+
+  const clearOauthError = useCallback(() => setOauthError(null), []);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
@@ -101,10 +101,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signInWithGoogle,
       signInWithApple,
+      oauthError,
+      clearOauthError,
       signOut,
       deleteAccount,
     }),
-    [session, loading, signUp, signIn, signInWithGoogle, signInWithApple, signOut, deleteAccount],
+    [session, loading, signUp, signIn, signInWithGoogle, signInWithApple, oauthError, clearOauthError, signOut, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

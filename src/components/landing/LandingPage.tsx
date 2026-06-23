@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { getPrivacyPolicyUrl, getTermsUrl } from "@/lib/legal";
 import { joinWaitlist } from "@/lib/supabase/waitlist";
 
+const WAITLIST_BYPASS_CODE = "QUIPPR2025";
+
 export function LandingPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -10,6 +14,12 @@ export function LandingPage() {
 
   async function handleNotify(e: React.FormEvent) {
     e.preventDefault();
+
+    if (email.trim() === WAITLIST_BYPASS_CODE) {
+      void navigate({ to: "/app" });
+      return;
+    }
+
     setBusy(true);
     setStatus("idle");
 
@@ -64,7 +74,7 @@ export function LandingPage() {
             {status === "success" ? (
               <p className="mt-4 text-center text-sm text-emerald-400">{message}</p>
             ) : (
-              <form onSubmit={(e) => void handleNotify(e)} className="mt-5 space-y-3">
+              <form onSubmit={(e) => void handleNotify(e)} noValidate className="mt-5 space-y-3">
                 <input
                   type="email"
                   value={email}

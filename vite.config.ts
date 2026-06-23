@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
@@ -9,22 +8,12 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
-/** Merge VITE_* from project root when cwd is not the repo root (same idea as before). */
+/** Merge VITE_* from project root when cwd is not the repo root. */
 function viteEnvFromProjectRoot(): Plugin {
   return {
     name: "vite-env-from-project-root",
     config(_cfg, { mode }) {
       const loaded = loadEnv(mode, projectRoot, "VITE_");
-      const dotEnvPath = path.join(projectRoot, ".env");
-
-      console.log("[vite-env-from-project-root]", {
-        projectRoot,
-        mode,
-        dotEnvPath,
-        dotEnvExists: fs.existsSync(dotEnvPath),
-        loadedKeys: Object.keys(loaded).sort(),
-      });
-
       return {
         define: Object.fromEntries(
           Object.entries(loaded).map(([key, value]) => [

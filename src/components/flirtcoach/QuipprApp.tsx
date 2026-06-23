@@ -7,21 +7,26 @@ import { Profile } from "@/components/flirtcoach/Profile";
 import { History } from "@/components/flirtcoach/History";
 import { HistoryChat } from "@/components/flirtcoach/HistoryChat";
 import { Stats } from "@/components/flirtcoach/Stats";
+import { Paywall } from "@/components/flirtcoach/Paywall";
 import { GdprConsent } from "@/components/flirtcoach/GdprConsent";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePremium } from "@/contexts/PremiumContext";
 import { hasGdprConsent } from "@/lib/gdpr";
-import { createConversation } from "@/lib/supabase/conversations";
+import { FREE_CONVERSATION_LIMIT } from "@/lib/revenuecat/premium";
+import { createConversation, getConversationsForUser } from "@/lib/supabase/conversations";
 import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 
-type Screen = "onboarding" | "home" | "chat" | "profile" | "history" | "historyChat" | "stats";
+type Screen = "onboarding" | "home" | "chat" | "profile" | "history" | "historyChat" | "stats" | "paywall";
 
 export function QuipprApp() {
   const { user, loading: authLoading } = useAuth();
+  const { isPremium } = usePremium();
   const [screen, setScreen] = useState<Screen>("home");
   const [character, setCharacter] = useState<Character | null>(null);
   const [scenario, setScenario] = useState<ScenarioId>("neutral");
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [historyConversationId, setHistoryConversationId] = useState<string | null>(null);
+  const [conversationCount, setConversationCount] = useState(0);
   const [hydrated, setHydrated] = useState(false);
   const [consentGiven, setConsentGiven] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
@@ -33,19 +38,37 @@ export function QuipprApp() {
     setHydrated(true);
   }, []);
 
+  useEffect(() => {
+    if (!user?.id) return;
+    void getConversationsForUser(user.id)
+      .then((rows) => setConversationCount(rows.length))
+      .catch((e) => console.error("Failed to load conversation count:", e));
+  }, [user?.id, screen]);
+
   function finishOnboarding() {
     localStorage.setItem("fc_onboarded", "1");
     setScreen("home");
   }
 
+  function openPaywall() {
+    setScreen("paywall");
+  }
+
   async function startChat(c: Character, s: ScenarioId) {
     if (!user) return;
+
+    if (!isPremium && conversationCount >= FREE_CONVERSATION_LIMIT) {
+      openPaywall();
+      return;
+    }
+
     setStartingChat(true);
     try {
       const id = await createConversation(user.id, c.id, s);
       setCharacter(c);
       setScenario(s);
       setConversationId(id);
+      setConversationCount((count) => count + 1);
       setScreen("chat");
     } catch (e) {
       console.error("Failed to create conversation:", e);
@@ -84,13 +107,23 @@ export function QuipprApp() {
         {screen === "onboarding" && <Onboarding onDone={finishOnboarding} />}
         {screen === "home" && (
           <Home
+            isPremium={isPremium}
+            conversationCount={conversationCount}
+            conversationLimit={FREE_CONVERSATION_LIMIT}
             onStart={(c, s) => void startChat(c, s)}
             onProfile={() => setScreen("profile")}
             onHistory={() => setScreen("history")}
             onStats={() => setScreen("stats")}
+            onPremium={openPaywall}
           />
         )}
-        {screen === "profile" && <Profile onBack={() => setScreen("home")} />}
+        {screen === "profile" && (
+          <Profile
+            isPremium={isPremium}
+            onBack={() => setScreen("home")}
+            onPremium={openPaywall}
+          />
+        )}
         {screen === "history" && (
           <History
             onBack={() => setScreen("home")}
@@ -101,6 +134,9 @@ export function QuipprApp() {
           />
         )}
         {screen === "stats" && <Stats onBack={() => setScreen("home")} />}
+        {screen === "paywall" && (
+          <Paywall onBack={() => setScreen("home")} onPurchaseSuccess={() => setScreen("home")} />
+        )}
         {screen === "historyChat" && historyConversationId && (
           <HistoryChat conversationId={historyConversationId} onBack={() => setScreen("history")} />
         )}
@@ -109,6 +145,8 @@ export function QuipprApp() {
             character={character}
             scenario={scenario}
             conversationId={conversationId}
+            isPremium={isPremium}
+            onPremium={openPaywall}
             onBack={() => {
               setConversationId(null);
               setScreen("home");

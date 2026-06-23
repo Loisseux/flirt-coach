@@ -9,7 +9,7 @@ export function getOAuthRedirectUrl(): string {
     return NATIVE_OAUTH_CALLBACK;
   }
 
-  const base = import.meta.env.VITE_APP_URL?.replace(/\/$/, "") || window.location.origin;
+  const base = import.meta.env.VITE_APP_URL?.replace(/\/$/, "") || "https://quippr.app";
   return `${base}/app`;
 }
 

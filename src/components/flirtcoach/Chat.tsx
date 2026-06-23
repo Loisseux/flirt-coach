@@ -3,6 +3,10 @@ import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 import { SCENARIOS } from "@/lib/flirtcoach/data";
 import { sendChat, getHints, getFeedback, type ChatMessage } from "@/lib/flirtcoach/claude";
 import { saveConversationScore, saveMessage } from "@/lib/supabase/conversations";
+import {
+  FREE_FEEDBACK_PER_CONVERSATION,
+  FREE_HINTS_PER_CONVERSATION,
+} from "@/lib/revenuecat/premium";
 
 function fmtTime(d: Date) {
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -14,11 +18,15 @@ export function Chat({
   character,
   scenario,
   conversationId,
+  isPremium,
+  onPremium,
   onBack,
 }: {
   character: Character;
   scenario: ScenarioId;
   conversationId: string;
+  isPremium: boolean;
+  onPremium: () => void;
   onBack: () => void;
 }) {
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -38,6 +46,8 @@ export function Chat({
   const [animatedScore, setAnimatedScore] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
+  const hintsUsedRef = useRef(0);
+  const feedbackUsedRef = useRef(0);
   messagesRef.current = messages;
 
   useEffect(() => {
@@ -85,6 +95,11 @@ export function Chat({
   }
 
   async function openHints() {
+    if (!isPremium && hintsUsedRef.current >= FREE_HINTS_PER_CONVERSATION) {
+      onPremium();
+      return;
+    }
+
     setHintsOpen(true);
     setHints(null);
     setHintsLoading(true);
@@ -92,6 +107,7 @@ export function Chat({
       const history = messagesRef.current.map(({ role, content }) => ({ role, content }));
       const h = await getHints(character, scenario, history);
       setHints(h);
+      hintsUsedRef.current += 1;
     } catch (e) {
       setHints({ safe: `⚠️ ${(e as Error).message}`, bold: "", funny: "" });
     } finally {
@@ -100,6 +116,11 @@ export function Chat({
   }
 
   async function openFeedback() {
+    if (!isPremium && feedbackUsedRef.current >= FREE_FEEDBACK_PER_CONVERSATION) {
+      onPremium();
+      return;
+    }
+
     setFeedbackOpen(true);
     setFeedback(null);
     setAnimatedScore(0);
@@ -111,6 +132,7 @@ export function Chat({
         messages.map(({ role, content }) => ({ role, content })),
       );
       setFeedback(f);
+      feedbackUsedRef.current += 1;
       // Persist score so the history + stats screens can be computed later.
       void saveConversationScore(conversationId, f.score).catch((e) => {
         console.error("Failed to save conversation score:", e);

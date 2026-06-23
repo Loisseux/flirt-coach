@@ -1,7 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 
 export const APP_BASE_URL =
-  import.meta.env.VITE_APP_URL?.replace(/\/$/, "") || "https://flirt-coach-ten.vercel.app";
+  import.meta.env.VITE_APP_URL?.replace(/\/$/, "") || "https://quippr.app";
 
 export const SUPPORT_EMAIL = "flirtcoachapp@gmail.com";
 

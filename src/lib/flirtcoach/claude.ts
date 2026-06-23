@@ -4,7 +4,7 @@ import { SCENARIOS, type ScenarioId } from "./data";
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
 const API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "claude-sonnet-4-5";
 
 function getKey(): string {
   const raw = import.meta.env.VITE_ANTHROPIC_API_KEY as string | undefined;

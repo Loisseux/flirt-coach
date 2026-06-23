@@ -1,20 +1,47 @@
 import { useState } from "react";
 import { CHARACTERS, SCENARIOS, type Character, type ScenarioId } from "@/lib/flirtcoach/data";
+import { FREE_SCENARIO_ID } from "@/lib/revenuecat/premium";
 
 export function Home({
+  isPremium,
+  conversationCount,
+  conversationLimit,
   onStart,
   onProfile,
   onHistory,
   onStats,
+  onPremium,
 }: {
+  isPremium: boolean;
+  conversationCount: number;
+  conversationLimit: number;
   onStart: (c: Character, s: ScenarioId) => void;
   onProfile: () => void;
   onHistory: () => void;
   onStats: () => void;
+  onPremium: () => void;
 }) {
   const [charId, setCharId] = useState(CHARACTERS[0].id);
-  const [scen, setScen] = useState<ScenarioId>("neutral");
+  const [scen, setScen] = useState<ScenarioId>(FREE_SCENARIO_ID);
   const character = CHARACTERS.find((c) => c.id === charId)!;
+  const conversationsRemaining = Math.max(0, conversationLimit - conversationCount);
+  const atConversationLimit = !isPremium && conversationCount >= conversationLimit;
+
+  function selectScenario(id: ScenarioId) {
+    if (!isPremium && id !== FREE_SCENARIO_ID) {
+      onPremium();
+      return;
+    }
+    setScen(id);
+  }
+
+  function handleStart() {
+    if (atConversationLimit) {
+      onPremium();
+      return;
+    }
+    onStart(character, scen);
+  }
 
   return (
     <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-1 flex-col px-5 pt-4">
@@ -32,6 +59,23 @@ export function Home({
         </button>
       </div>
       <p className="mb-7 text-sm text-white/60">Pick someone to chat with.</p>
+
+      {!isPremium && (
+        <button
+          type="button"
+          onClick={onPremium}
+          className="fc-glass mb-6 w-full rounded-2xl px-4 py-3 text-left active:scale-[0.99]"
+        >
+          <div className="text-xs font-semibold uppercase tracking-wider text-pink-400">
+            Free plan
+          </div>
+          <div className="mt-1 text-sm text-white/80">
+            {atConversationLimit
+              ? "Conversation limit reached — upgrade for unlimited practice."
+              : `${conversationsRemaining} of ${conversationLimit} conversations left · Neutral scenario only`}
+          </div>
+        </button>
+      )}
 
       <div className="mb-8 grid grid-cols-2 gap-3">
         <button
@@ -84,13 +128,20 @@ export function Home({
       <div className="mb-2 grid grid-cols-5 gap-2">
         {SCENARIOS.map((s) => {
           const active = s.id === scen;
+          const locked = !isPremium && s.id !== FREE_SCENARIO_ID;
           return (
             <button
               key={s.id}
-              onClick={() => setScen(s.id)}
-              className={`fc-glass flex flex-col items-center rounded-xl px-1 py-3 transition-all ${active ? "ring-2 ring-pink-500" : "opacity-60"}`}
+              type="button"
+              onClick={() => selectScenario(s.id)}
+              className={`relative fc-glass flex flex-col items-center rounded-xl px-1 py-3 transition-all ${active ? "ring-2 ring-pink-500" : locked ? "opacity-40" : "opacity-60"}`}
             >
               <div className="text-xl">{s.emoji}</div>
+              {locked && (
+                <span className="absolute -right-1 -top-1 rounded-full bg-black/80 px-1 text-[9px]">
+                  🔒
+                </span>
+              )}
             </button>
           );
         })}
@@ -101,10 +152,10 @@ export function Home({
 
       <button
         type="button"
-        onClick={() => onStart(character, scen)}
+        onClick={handleStart}
         className="fc-gradient mt-2 w-full shrink-0 rounded-2xl py-4 text-base font-semibold text-white shadow-lg active:scale-[0.98]"
       >
-        Start conversation →
+        {atConversationLimit ? "Upgrade to continue →" : "Start conversation →"}
       </button>
     </div>
   );

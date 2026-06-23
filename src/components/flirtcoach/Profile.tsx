@@ -17,7 +17,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export function Profile({ onBack }: { onBack: () => void }) {
+export function Profile({
+  onBack,
+  onPremium,
+  isPremium,
+}: {
+  onBack: () => void;
+  onPremium: () => void;
+  isPremium: boolean;
+}) {
   const { user, signOut, deleteAccount } = useAuth();
   const email = user?.email ?? "Unknown";
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -57,6 +65,18 @@ export function Profile({ onBack }: { onBack: () => void }) {
         </div>
         <div className="text-base text-white">{email}</div>
       </div>
+
+      <button
+        type="button"
+        onClick={onPremium}
+        className={`mt-6 w-full rounded-2xl py-4 text-base font-semibold shadow-lg active:scale-[0.98] ${
+          isPremium
+            ? "fc-glass text-emerald-400"
+            : "fc-gradient text-white"
+        }`}
+      >
+        {isPremium ? "✨ Premium active" : "✨ Upgrade to Premium"}
+      </button>
 
       <div className="fc-glass mt-6 overflow-hidden rounded-2xl">
         <LegalLink

@@ -1,15 +1,38 @@
 import { useState } from "react";
+import { trackOnboardingCompleted, trackOnboardingSkipped } from "@/lib/analytics/posthog";
 
 const SLIDES = [
-  { emoji: "💬", title: "Practice makes perfect", subtitle: "Train your conversation skills with Quippr in a safe, judgment-free space" },
-  { emoji: "🎯", title: "Choose your scenario", subtitle: "From cold start to very interested — you decide the challenge" },
-  { emoji: "📊", title: "Get real feedback", subtitle: "AI scores your conversation and tells you exactly how to improve" },
+  {
+    emoji: "💬",
+    title: "Practice makes perfect",
+    subtitle: "Train your conversation skills with Quippr in a safe, judgment-free space",
+  },
+  {
+    emoji: "🎯",
+    title: "Choose your scenario",
+    subtitle: "From cold start to very interested — you decide the challenge",
+  },
+  {
+    emoji: "📊",
+    title: "Get real feedback",
+    subtitle: "AI scores your conversation and tells you exactly how to improve",
+  },
 ];
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const [i, setI] = useState(0);
   const slide = SLIDES[i];
   const last = i === SLIDES.length - 1;
+
+  function handleSkip() {
+    trackOnboardingSkipped(i);
+    onDone();
+  }
+
+  function handleComplete() {
+    trackOnboardingCompleted();
+    onDone();
+  }
 
   return (
     <div className="fc-screen-scroll fc-scroll-bottom-pad flex min-h-0 flex-col px-6 py-8">
@@ -20,7 +43,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       </div>
 
       <div className="flex justify-end">
-        <button onClick={onDone} className="text-sm text-white/60 hover:text-white">
+        <button onClick={handleSkip} className="text-sm text-white/60 hover:text-white">
           Skip
         </button>
       </div>
@@ -43,11 +66,17 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       </div>
 
       {last ? (
-        <button onClick={onDone} className="fc-gradient w-full rounded-2xl py-4 text-base font-semibold text-white shadow-lg active:scale-[0.98]">
+        <button
+          onClick={handleComplete}
+          className="fc-gradient w-full rounded-2xl py-4 text-base font-semibold text-white shadow-lg active:scale-[0.98]"
+        >
           Let's go →
         </button>
       ) : (
-        <button onClick={() => setI(i + 1)} className="fc-glass w-full rounded-2xl py-4 text-base font-semibold text-white active:scale-[0.98]">
+        <button
+          onClick={() => setI(i + 1)}
+          className="fc-glass w-full rounded-2xl py-4 text-base font-semibold text-white active:scale-[0.98]"
+        >
           Next
         </button>
       )}

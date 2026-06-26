@@ -11,6 +11,7 @@ import { Paywall } from "@/components/flirtcoach/Paywall";
 import { GdprConsent } from "@/components/flirtcoach/GdprConsent";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePremium } from "@/contexts/PremiumContext";
+import { trackConversationLimitReached, trackConversationStarted } from "@/lib/analytics/posthog";
 import { hasGdprConsent } from "@/lib/gdpr";
 import { FREE_CONVERSATION_LIMIT } from "@/lib/revenuecat/premium";
 import { createConversation, getConversationsForUser } from "@/lib/supabase/conversations";
@@ -58,6 +59,7 @@ export function QuipprApp() {
     if (!user) return;
 
     if (!isPremium && conversationCount >= FREE_CONVERSATION_LIMIT) {
+      trackConversationLimitReached();
       openPaywall();
       return;
     }
@@ -69,6 +71,7 @@ export function QuipprApp() {
       setScenario(s);
       setConversationId(id);
       setConversationCount((count) => count + 1);
+      trackConversationStarted(c.name, s);
       setScreen("chat");
     } catch (e) {
       console.error("Failed to create conversation:", e);

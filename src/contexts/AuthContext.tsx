@@ -8,6 +8,12 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import {
+  identifyUser,
+  resetUser,
+  trackUserSignedIn,
+  trackUserSignedOut,
+} from "@/lib/analytics/posthog";
 import { supabase } from "@/lib/supabase/client";
 import { deleteAccount as deleteAccountData } from "@/lib/supabase/account";
 import { registerNativeOAuthListener, signInWithOAuthProvider } from "@/lib/supabase/auth";
@@ -37,13 +43,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setLoading(false);
+      if (s?.user?.id) identifyUser(s.user.id);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, s) => {
+    } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
       setLoading(false);
+
+      if (s?.user?.id) {
+        identifyUser(s.user.id);
+        if (event === "SIGNED_IN") {
+          trackUserSignedIn();
+        }
+      } else if (event === "SIGNED_OUT") {
+        trackUserSignedOut();
+        resetUser();
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -106,7 +123,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       deleteAccount,
     }),
-    [session, loading, signUp, signIn, signInWithGoogle, signInWithApple, oauthError, clearOauthError, signOut, deleteAccount],
+    [
+      session,
+      loading,
+      signUp,
+      signIn,
+      signInWithGoogle,
+      signInWithApple,
+      oauthError,
+      clearOauthError,
+      signOut,
+      deleteAccount,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

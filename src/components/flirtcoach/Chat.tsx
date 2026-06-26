@@ -3,6 +3,7 @@ import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 import { SCENARIOS } from "@/lib/flirtcoach/data";
 import { sendChat, getHints, getFeedback, type ChatMessage } from "@/lib/flirtcoach/claude";
 import { saveConversationScore, saveMessage } from "@/lib/supabase/conversations";
+import { trackFeedbackRequested, trackHintRequested, trackHintUsed } from "@/lib/analytics/posthog";
 import {
   FREE_FEEDBACK_PER_CONVERSATION,
   FREE_HINTS_PER_CONVERSATION,
@@ -103,6 +104,7 @@ export function Chat({
     setHintsOpen(true);
     setHints(null);
     setHintsLoading(true);
+    trackHintRequested();
     try {
       const history = messagesRef.current.map(({ role, content }) => ({ role, content }));
       const h = await getHints(character, scenario, history);
@@ -132,6 +134,7 @@ export function Chat({
         messages.map(({ role, content }) => ({ role, content })),
       );
       setFeedback(f);
+      trackFeedbackRequested(f.score);
       feedbackUsedRef.current += 1;
       // Persist score so the history + stats screens can be computed later.
       void saveConversationScore(conversationId, f.score).catch((e) => {
@@ -152,7 +155,8 @@ export function Chat({
     }
   }
 
-  function pickHint(text: string) {
+  function pickHint(text: string, hintType: string) {
+    trackHintUsed(hintType);
     setInput(text);
     setHintsOpen(false);
   }
@@ -256,9 +260,27 @@ export function Chat({
           {hintsLoading && <div className="py-6 text-center text-sm text-white/60">Thinking…</div>}
           {hints && !hintsLoading && (
             <div className="space-y-2">
-              <HintRow label="Safe & playful" color="#34D399" text={hints.safe} onPick={pickHint} />
-              <HintRow label="Bold & flirty" color="#FF2D87" text={hints.bold} onPick={pickHint} />
-              <HintRow label="Funny & witty" color="#F59E0B" text={hints.funny} onPick={pickHint} />
+              <HintRow
+                label="Safe & playful"
+                color="#34D399"
+                text={hints.safe}
+                hintType="safe"
+                onPick={pickHint}
+              />
+              <HintRow
+                label="Bold & flirty"
+                color="#FF2D87"
+                text={hints.bold}
+                hintType="bold"
+                onPick={pickHint}
+              />
+              <HintRow
+                label="Funny & witty"
+                color="#F59E0B"
+                text={hints.funny}
+                hintType="funny"
+                onPick={pickHint}
+              />
             </div>
           )}
         </Sheet>
@@ -336,17 +358,19 @@ function HintRow({
   label,
   color,
   text,
+  hintType,
   onPick,
 }: {
   label: string;
   color: string;
   text: string;
-  onPick: (t: string) => void;
+  hintType: string;
+  onPick: (t: string, hintType: string) => void;
 }) {
   return (
     <button
       type="button"
-      onClick={() => text && onPick(text)}
+      onClick={() => text && onPick(text, hintType)}
       className="fc-glass flex w-full flex-col items-start gap-1 rounded-2xl p-4 text-left active:scale-[0.99]"
     >
       <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color }}>

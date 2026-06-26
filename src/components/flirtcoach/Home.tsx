@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { trackConversationLimitReached } from "@/lib/analytics/posthog";
 import { CHARACTERS, SCENARIOS, type Character, type ScenarioId } from "@/lib/flirtcoach/data";
 import { FREE_SCENARIO_ID } from "@/lib/revenuecat/premium";
 
@@ -37,6 +38,7 @@ export function Home({
 
   function handleStart() {
     if (atConversationLimit) {
+      trackConversationLimitReached();
       onPremium();
       return;
     }

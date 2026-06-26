@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { PurchasesOffering, PurchasesPackage } from "@revenuecat/purchases-capacitor";
 import { useAuth } from "@/contexts/AuthContext";
+import { hasDevPremiumBypass } from "@/lib/dev-mode";
 import { isRevenueCatAvailable } from "@/lib/revenuecat/config";
 import {
   computeYearlySavingsPercent,
@@ -45,7 +46,8 @@ const PremiumContext = createContext<PremiumContextValue | null>(null);
 
 export function PremiumProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [isPremium, setIsPremium] = useState(false);
+  const [revenueCatPremium, setRevenueCatPremium] = useState(false);
+  const isPremium = revenueCatPremium || hasDevPremiumBypass(user?.email);
   const [loading, setLoading] = useState(isRevenueCatAvailable());
   const [offering, setOffering] = useState<PurchasesOffering | null>(null);
   const [offeringsLoading, setOfferingsLoading] = useState(isRevenueCatAvailable());
@@ -64,12 +66,12 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
   );
 
   const applyCustomerInfo = useCallback((info: { entitlements: { active: Record<string, { isActive?: boolean }> } } | null) => {
-    setIsPremium(hasPremiumEntitlement(info));
+    setRevenueCatPremium(hasPremiumEntitlement(info));
   }, []);
 
   const refreshPremium = useCallback(async () => {
     if (!isRevenueCatAvailable()) {
-      setIsPremium(false);
+      setRevenueCatPremium(false);
       setLoading(false);
       return;
     }

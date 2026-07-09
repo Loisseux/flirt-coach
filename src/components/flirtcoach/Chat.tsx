@@ -3,7 +3,12 @@ import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 import { SCENARIOS } from "@/lib/flirtcoach/data";
 import { sendChat, getHints, getFeedback, type ChatMessage } from "@/lib/flirtcoach/claude";
 import { saveConversationScore, saveMessage } from "@/lib/supabase/conversations";
-import { trackFeedbackRequested, trackHintRequested, trackHintUsed } from "@/lib/analytics/posthog";
+import {
+  trackFeedbackRequested,
+  trackHintRequested,
+  trackHintUsed,
+  trackMessageSent,
+} from "@/lib/analytics/posthog";
 import {
   FREE_FEEDBACK_PER_CONVERSATION,
   FREE_HINTS_PER_CONVERSATION,
@@ -71,6 +76,7 @@ export function Chat({
     setMessages(next);
     setInput("");
     setTyping(true);
+    trackMessageSent(character.name, scenario, text.length);
     void persistMessage("user", text);
 
     const delay = 1000 + Math.random() * 2000;

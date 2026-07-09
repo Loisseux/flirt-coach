@@ -63,3 +63,19 @@ export function trackOnboardingCompleted() {
 export function trackOnboardingSkipped(slideIndex: number) {
   capture("onboarding_skipped", { slide_index: slideIndex });
 }
+
+export function trackWaitlistJoined(email: string) {
+  capture("waitlist_joined", { email });
+}
+
+export function trackMessageSent(characterName: string, scenario: string, messageLength: number) {
+  capture("message_sent", {
+    character_name: characterName,
+    scenario,
+    message_length: messageLength,
+  });
+}
+
+export function trackGdprAccepted() {
+  capture("gdpr_accepted");
+}

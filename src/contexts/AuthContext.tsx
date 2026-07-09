@@ -14,7 +14,7 @@ import {
   trackUserSignedIn,
   trackUserSignedOut,
 } from "@/lib/analytics/posthog";
-import { supabase } from "@/lib/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { deleteAccount as deleteAccountData } from "@/lib/supabase/account";
 import { registerNativeOAuthListener, signInWithOAuthProvider } from "@/lib/supabase/auth";
 
@@ -40,6 +40,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [oauthError, setOauthError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setLoading(false);

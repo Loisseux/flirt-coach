@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AppErrorFallback } from "@/components/AppErrorFallback";
 import { Onboarding } from "@/components/flirtcoach/Onboarding";
 import { Home } from "@/components/flirtcoach/Home";
 import { Chat } from "@/components/flirtcoach/Chat";
@@ -15,6 +16,7 @@ import { trackConversationLimitReached, trackConversationStarted } from "@/lib/a
 import { hasGdprConsent } from "@/lib/gdpr";
 import { FREE_CONVERSATION_LIMIT } from "@/lib/revenuecat/premium";
 import { createConversation, getConversationsForUser } from "@/lib/supabase/conversations";
+import { isSupabaseConfigured, supabaseConfigError } from "@/lib/supabase/client";
 import type { Character, ScenarioId } from "@/lib/flirtcoach/data";
 
 type Screen = "onboarding" | "home" | "chat" | "profile" | "history" | "historyChat" | "stats" | "paywall";
@@ -78,6 +80,14 @@ export function QuipprApp() {
     } finally {
       setStartingChat(false);
     }
+  }
+
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="fc-app-shell mx-auto w-full max-w-[430px]">
+        <AppErrorFallback message={supabaseConfigError ?? undefined} />
+      </div>
+    );
   }
 
   if (!hydrated || authLoading) {

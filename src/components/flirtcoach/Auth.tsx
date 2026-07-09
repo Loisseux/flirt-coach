@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackUserSignedUp } from "@/lib/analytics/posthog";
 
 type Mode = "signin" | "signup";
 
 export function Auth() {
-  const { signIn, signUp, signInWithApple, signInWithGoogle, oauthError, clearOauthError } = useAuth();
+  const { signIn, signUp, signInWithApple, signInWithGoogle, oauthError, clearOauthError } =
+    useAuth();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,6 +26,7 @@ export function Auth() {
     if (result.error) {
       setError(result.error);
     } else if (mode === "signup") {
+      trackUserSignedUp();
       setInfo("Check your email to confirm your account, then sign in.");
     }
 

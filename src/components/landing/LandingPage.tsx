@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { getPrivacyPolicyUrl, getTermsUrl } from "@/lib/legal";
 import { joinWaitlist } from "@/lib/supabase/waitlist";
+import { trackWaitlistJoined } from "@/lib/analytics/posthog";
 
 const WAITLIST_BYPASS_CODE = "QUIPPR2025";
 
@@ -26,6 +27,7 @@ export function LandingPage() {
     const result = await joinWaitlist(email);
 
     if (result.ok) {
+      trackWaitlistJoined(email);
       setStatus("success");
       setMessage(result.message);
       setEmail("");

@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { getPrivacyPolicyUrl, getTermsUrl, setGdprConsent } from "@/lib/gdpr";
 import { openInBrowser } from "@/lib/legal";
+import { trackGdprAccepted } from "@/lib/analytics/posthog";
 
 export function GdprConsent({ onAccept }: { onAccept: () => void }) {
   const [declined, setDeclined] = useState(false);
 
   function handleAccept() {
     setGdprConsent();
+    trackGdprAccepted();
     onAccept();
   }
 
@@ -50,8 +52,7 @@ export function GdprConsent({ onAccept }: { onAccept: () => void }) {
 
       <div className="fc-glass mb-8 space-y-4 rounded-2xl p-5 text-sm leading-relaxed text-white/80">
         <p>
-          To provide the service, Quippr collects and stores data linked to your account,
-          including:
+          To provide the service, Quippr collects and stores data linked to your account, including:
         </p>
         <ul className="list-disc space-y-2 pl-5">
           <li>

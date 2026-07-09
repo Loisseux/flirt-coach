@@ -8,6 +8,7 @@ import {
 } from "@/lib/analytics/posthog";
 import { formatPackagePrice, resolvePackageForPlan } from "@/lib/revenuecat/premium";
 import { isRevenueCatAvailable } from "@/lib/revenuecat/config";
+import { APPLE_SUBSCRIPTION_TERMS_URL, getPrivacyPolicyUrl, openInBrowser } from "@/lib/legal";
 
 type Plan = "monthly" | "yearly";
 
@@ -187,6 +188,26 @@ export function Paywall({
           Restore purchases
         </button>
       )}
+
+      <div className="mt-2 flex items-center justify-center gap-2 text-xs">
+        <button
+          type="button"
+          onClick={() => void openInBrowser(APPLE_SUBSCRIPTION_TERMS_URL)}
+          className="text-white/35 underline-offset-2 active:text-white/55"
+        >
+          Terms of Use
+        </button>
+        <span className="text-white/20" aria-hidden="true">
+          ·
+        </span>
+        <button
+          type="button"
+          onClick={() => void openInBrowser(getPrivacyPolicyUrl())}
+          className="text-white/35 underline-offset-2 active:text-white/55"
+        >
+          Privacy Policy
+        </button>
+      </div>
 
       <p className="mt-4 text-center text-[11px] leading-relaxed text-white/35">
         Free trial, then {plan === "yearly" ? `${yearlyPrice}/year` : `${monthlyPrice}/month`}.

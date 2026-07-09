@@ -13,6 +13,10 @@ export function getTermsUrl(): string {
   return `${APP_BASE_URL}/terms.html`;
 }
 
+/** Apple Standard EULA for auto-renewable subscriptions (App Store requirement). */
+export const APPLE_SUBSCRIPTION_TERMS_URL =
+  "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+
 export function getSupportMailtoUrl(): string {
   const subject = encodeURIComponent("Quippr Support");
   return `mailto:${SUPPORT_EMAIL}?subject=${subject}`;

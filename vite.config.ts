@@ -5,6 +5,12 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import {
+  DEFAULT_SUPABASE_ANON_KEY,
+  DEFAULT_SUPABASE_URL,
+  resolveSupabaseAnonKey,
+  resolveSupabaseUrl,
+} from "./src/lib/supabase/config";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,9 +20,16 @@ function viteEnvFromProjectRoot(): Plugin {
     name: "vite-env-from-project-root",
     config(_cfg, { mode }) {
       const loaded = loadEnv(mode, projectRoot, "VITE_");
+      const envEntries = {
+        ...loaded,
+        VITE_SUPABASE_URL: resolveSupabaseUrl(loaded.VITE_SUPABASE_URL) || DEFAULT_SUPABASE_URL,
+        VITE_SUPABASE_ANON_KEY:
+          resolveSupabaseAnonKey(loaded.VITE_SUPABASE_ANON_KEY) || DEFAULT_SUPABASE_ANON_KEY,
+      };
+
       return {
         define: Object.fromEntries(
-          Object.entries(loaded).map(([key, value]) => [
+          Object.entries(envEntries).map(([key, value]) => [
             `import.meta.env.${key}`,
             JSON.stringify(value),
           ]),

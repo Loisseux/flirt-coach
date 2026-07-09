@@ -1,21 +1,38 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
-import posthog from "posthog-js";
+import { AppErrorBoundary } from "@/components/AppErrorBoundary";
+import { AppErrorFallback } from "@/components/AppErrorFallback";
+import { installGlobalErrorHandler, registerAppRoot } from "@/lib/global-error-handler";
 import { router } from "@/router";
 import "@/styles.css";
 
-posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN as string, {
-  api_host: "/ingest",
-  ui_host: (import.meta.env.VITE_PUBLIC_POSTHOG_HOST as string) || "https://eu.posthog.com",
-  defaults: "2026-01-30",
-  capture_exceptions: true,
-  person_profiles: "identified_only",
-  debug: import.meta.env.DEV,
-});
+installGlobalErrorHandler();
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
-);
+const container = document.getElementById("root");
+if (!container) {
+  throw new Error("Root element #root not found");
+}
+
+try {
+  const root = createRoot(container);
+  registerAppRoot(root);
+
+  root.render(
+    <StrictMode>
+      <AppErrorBoundary>
+        <RouterProvider router={router} />
+      </AppErrorBoundary>
+    </StrictMode>,
+  );
+} catch (error) {
+  console.error("[bootstrap]", error);
+  const root = createRoot(container);
+  registerAppRoot(root);
+  root.render(
+    <AppErrorFallback
+      message={error instanceof Error ? error.message : undefined}
+      onRetry={() => window.location.reload()}
+    />,
+  );
+}
